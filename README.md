@@ -26,24 +26,24 @@ Do not try to run this on Linux systems.
 
 3. Check if you have custom.xml file in <CONTROLLER_HOME_DIR>\custom\actions\ directory. If yes, add the following xml to the <custom-actions> element.
 
-        ```
-            <action>
-                 <type>GenericPowerShellAlerting</type>
-                 <!-- For windows must invoke .bat files -->
-                 <executable>GenericPowerShellAlerting.bat</executable>
-            </action>    
-        ```
-     If you don't have custom.xml already, create one with the below xml content. 
+```
+    <action>
+         <type>GenericPowerShellAlerting</type>
+         <!-- For windows must invoke .bat files -->
+         <executable>GenericPowerShellAlerting.bat</executable>
+    </action>    
+```
+If you don't have custom.xml already, create one with the below xml content. 
      
-     ```
-            <custom-actions>
-                <action>
-                     <type>GenericPowerShellAlerting</type>
-                     <!-- For windows must invoke .bat files -->
-                     <executable>GenericPowerShellAlerting.bat</executable>
-                </action>    
-            </custom-actions>
-     ```
+```
+    <custom-actions>
+        <action>
+             <type>GenericPowerShellAlerting</type>
+             <!-- For windows must invoke .bat files -->
+             <executable>GenericPowerShellAlerting.bat</executable>
+        </action>    
+    </custom-actions>
+```
 
 ##Using 
 The extension becomes available in AppDynamics controller UI immediately. You can then use it to create Custom Action that can be associated
