@@ -44,6 +44,7 @@ Do not try to run this on Linux systems.
                 </action>    
             </custom-actions>
      ```
+
 ##Using 
 The extension becomes available in AppDynamics controller UI immediately. You can then use it to create Custom Action that can be associated
 with health rule violations.
