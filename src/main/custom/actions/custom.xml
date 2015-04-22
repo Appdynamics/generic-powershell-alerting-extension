@@ -1,0 +1,7 @@
+<custom-actions>
+    <action>
+         <type>GenericPowerShellAlerting</type>
+         <!-- For windows must invoke .bat files -->
+         <executable>GenericPowerShellAlerting.bat</executable>
+    </action>    
+</custom-actions>
