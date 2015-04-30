@@ -59,7 +59,8 @@ try
         "SUMMARY_MESSAGE" = "";
         "INCIDENT_ID" = "";
         "DEEP_LINK_URL" = "";
-        "EVENT_TYPE" = ""
+        "EVENT_TYPE" = "";
+        "APP_DESCRIPTION" = ""
     }
 
     # Groups of parameters for health rule violation
@@ -211,7 +212,8 @@ try
                 "BASELINE_NAME" = "";
                 "BASELINE_ID" = "";
                 "THRESHOLD_VALUE" = "";
-                "OBSERVED_VALUE" = ""
+                "OBSERVED_VALUE" = "";
+                "TIER_DESCRIPTION" = ""
             }
         
             $triggeredCondition["SCOPE_TYPE"] = $script:args[$param++]
@@ -221,14 +223,19 @@ try
             $triggeredCondition["CONDITION_ID"] = $script:args[$param++]
             $triggeredCondition["OPERATOR"] = $script:args[$param++]
             $triggeredCondition["CONDITION_UNIT_TYPE"] = $script:args[$param++]
-            $triggeredCondition["USE_DEFAULT_BASELINE"] = $script:args[$param++]
-            $triggeredCondition["BASELINE_NAME"] = $script:args[$param++]
-            $triggeredCondition["BASELINE_ID"] = $script:args[$param++]
+            if ($triggeredCondition["CONDITION_UNIT_TYPE"].StartsWith("BASELINE") -eq $true)
+            {
+                $triggeredCondition["USE_DEFAULT_BASELINE"] = $script:args[$param++]
+                if ($triggeredCondition["USE_DEFAULT_BASELINE"].ToLower() -eq "false")
+                {
+                    $triggeredCondition["BASELINE_NAME"] = $script:args[$param++]
+                    $triggeredCondition["BASELINE_ID"] = $script:args[$param++]
+                }
+            }
             $triggeredCondition["THRESHOLD_VALUE"] = $script:args[$param++]
             $triggeredCondition["OBSERVED_VALUE"] = $script:args[$param++]
 
             $triggeredConditionColl += $triggeredCondition
-        
         }
         
         $healthRuleParameters["SUMMARY_MESSAGE"] = $script:args[$param++]
@@ -236,6 +243,31 @@ try
         $healthRuleParameters["DEEP_LINK_URL"] = $script:args[$param++]
         $healthRuleParameters["EVENT_TYPE"] = $script:args[$param++]
         
+        # Parse application description
+        $restURL = $healthRuleParameters["DEEP_LINK_URL"].Split('#')[0] + "rest/applications/" + $healthRuleParameters["APP_ID"]
+        $headers = @{Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("singularity-agent@customer1:SJ5b2m7d1`$354"))}
+        $headers
+        Write-Output "Calling REST:"
+        $restURL
+        $restResults = Invoke-RestMethod -Uri $restURL -Method Get -Headers $headers
+        Write-Output "Received from REST:"
+        $restResults.InnerXml
+        $healthRuleParameters["APP_DESCRIPTION"] = $restResults.applications.application.description
+        
+        foreach ($triggeredCondition in $triggeredConditionColl)
+        {
+            if($triggeredCondition["SCOPE_TYPE"] -eq "APPLICATION_COMPONENT")
+            {
+                $restURL = $healthRuleParameters["DEEP_LINK_URL"].Split('#')[0] + "rest/applications/" + $healthRuleParameters["APP_ID"] + "/tiers/" + $triggeredCondition["SCOPE_ID"]
+                Write-Output "Calling REST:"
+                $restURL
+                $restResults = Invoke-RestMethod -Uri $restURL -Method Get -Headers $headers
+                Write-Output "Received from REST:"
+                $restResults.InnerXml
+                $triggeredCondition["TIER_DESCRIPTION"] = $restResults.tiers.tier.description                
+            } 
+        }
+
         Write-Output "healthRuleParameters parsed:"
         $healthRuleParameters
         Write-Output "evaluationEntityColl parsed $($evaluationEntityColl.Count) groups:"
@@ -245,7 +277,7 @@ try
     }
 
     Write-Output "isHealthRuleViolation=$isHealthRuleViolation"
-    
+
     # At this point, following variables are now filled from the parameters passed to this script
     # $isHealthRuleViolation
     # $healthRuleParameters
@@ -258,7 +290,7 @@ try
     # send it via email (although AppDynamics Controller could have done that for you), or redirect into 
     # some custom external system using web service call using Invoke-RestMethod 
     Write-Output "Now do something useful with these parsed parameters!"
-
+    
 }
 finally
 {
