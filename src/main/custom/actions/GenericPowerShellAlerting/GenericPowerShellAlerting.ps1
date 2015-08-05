@@ -22,12 +22,13 @@
 #---------------------------------------------------------------------
 # Script begins
 $scriptFolderPath = Split-Path -Path $MyInvocation.MyCommand.Path
+$scriptFileName = $MyInvocation.MyCommand.Name
 
 #---------------------------------------------------------------------
 # Configure logging
 $startTime = [System.DateTime]::Now.ToString("yyyyMMdd-HHmmss")
 $logDirPath = $scriptFolderPath
-$logFilePath = Join-Path -Path $logDirPath -ChildPath "GenericPowerShellAlerting.$startTime.ps1.log"
+$logFilePath = Join-Path -Path $logDirPath -ChildPath "$scriptFileName.$startTime.log"
 
 try
 {
